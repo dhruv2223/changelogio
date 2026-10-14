@@ -1,0 +1,55 @@
+@host = http://localhost:5064
+
+### Create an account (returns { token })
+POST {{host}}/user
+Content-Type: application/json
+
+{ "username": "demo", "password": "demo-password" }
+
+### Sign in (returns { token })
+# @name signin
+POST {{host}}/signin
+Content-Type: application/json
+
+{ "username": "demo", "password": "demo-password" }
+
+###
+@token = {{signin.response.body.token}}
+
+### List products
+GET {{host}}/api/product
+Authorization: Bearer {{token}}
+
+### Create a product
+# @name product
+POST {{host}}/api/product
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "name": "My App" }
+
+### Create an update for it
+# @name update
+POST {{host}}/api/update
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "productId": "{{product.response.body.data.id}}", "title": "v1.0", "body": "First release", "version": "1.0.0" }
+
+### Mark it shipped
+PUT {{host}}/api/update/{{update.response.body.data.id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "status": "SHIPPED" }
+
+### Add an update point
+POST {{host}}/api/updatepoints
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "updateId": "{{update.response.body.data.id}}", "name": "Dark mode", "description": "Added a dark theme" }
+
+### List a product's updates
+GET {{host}}/api/update?productId={{product.response.body.data.id}}
+Authorization: Bearer {{token}}
